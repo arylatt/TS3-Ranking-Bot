@@ -2,7 +2,15 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp1.0</TargetFramework>
+    <AssemblyName>TS3_Ranking_Bot</AssemblyName>
+    <RootNamespace>TS3_Ranking_Bot</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="init.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="init.sql" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MySql.Data.EntityFrameworkCore" Version="7.0.6-IR31" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />

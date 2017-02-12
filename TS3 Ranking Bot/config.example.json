@@ -1,21 +1,21 @@
 ﻿{
   "database": {
-    "type": "mysql", // MySQL is the only supported database engine at this time
-    "server": "127.0.0.1", // MySQL Server
-    "username": "YourDBUser", // Database Username
-    "password": "YourDBPassword", // Database Password
-    "dbname": "YourDBName", // Database Name
-    "prefix": "rnk_" // Table Prefix
+    "type": "mysql",
+    "server": "127.0.0.1",
+    "username": "YourDBUser",
+    "password": "YourDBPassword",
+    "dbname": "YourDBName",
+    "prefix": "rnk_"
   },
   "teamspeak": {
-    "sq_ip": "ts.example.com", // Hostname or IP of TeamSpeak server to connect to
-    "sq_port": 11001, // ServerQuery port to connect to
-    "username": "YourSQUser", // ServerQuery Username
-    "password": "YourSQPassword", // ServerQuery Password
-    "ts_port": 9987 // TeamSpeak port
+    "sq_ip": "ts.example.com",
+    "sq_port": 11001,
+    "username": "YourSQUser",
+    "password": "YourSQPassword",
+    "ts_port": 9987
   },
   "ranking": {
-    "max_idle_time": 15, // Maximum time a client can be idle before ranking pauses (minutes)
-    "ranks": [] // Array of server group IDs in order of level
+    "max_idle_time": 15,
+    "ranks": []
   }
 }
