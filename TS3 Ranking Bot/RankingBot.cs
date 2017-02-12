@@ -14,7 +14,7 @@ namespace TS3_Ranking_Bot
         private static MySqlConnection _mysql;
         private static TS3Handler _ts3Hndl;
         public static QueryClient _ts3;
-        public static bool _debug = true;
+        public static bool _debug = false;
         public static string _debugger = "octI8B6usT54nOdZuknstdnEUAs=";
 
         public static void Main(string[] args)
@@ -22,6 +22,13 @@ namespace TS3_Ranking_Bot
             Log("Initialised TS3RankingBot");
             ReadConfigFile();
             InitDatabase();
+            _ts3Hndl = new TS3Handler();
+        }
+
+        public static void TryReconnect()
+        {
+            Log("WARN - TS3 - Lost Connection. Attempting to reconnect in 10 seconds", ConsoleColor.Yellow);
+            System.Threading.Thread.Sleep(10000);
             _ts3Hndl = new TS3Handler();
         }
 

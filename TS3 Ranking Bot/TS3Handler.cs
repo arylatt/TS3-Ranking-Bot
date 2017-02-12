@@ -142,6 +142,10 @@ namespace TS3_Ranking_Bot
                 }
             }
             while (RankingBot._ts3.Connected);
+            if (!_exiting)
+            {
+                RankingBot.TryReconnect();
+            }
         }
 
         private void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
@@ -226,6 +230,10 @@ namespace TS3_Ranking_Bot
 
         private void _ts3_ConnectionClosed(object sender, EventArgs<string> e)
         {
+            foreach (RankedClient cli in clients.Values)
+            {
+                cli.Dispose();
+            }
             if (!_exiting)
             {
                 RankingBot.Log("ERROR - TS3 - Connection to server lost", ConsoleColor.Red);
