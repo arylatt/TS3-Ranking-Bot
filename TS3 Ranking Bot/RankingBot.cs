@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.IO;
 using System.Reflection;
+using TS3QueryLib.Net.Core;
 
 namespace TS3_Ranking_Bot
 {
@@ -10,13 +11,18 @@ namespace TS3_Ranking_Bot
     {
         private static int _instanceId = 0;
         private static dynamic _config;
-        private static MySqlConnection _mysqlCon;
+        private static MySqlConnection _mysql;
+        private static TS3Handler _ts3Hndl;
+        public static QueryClient _ts3;
+        public static bool _debug = true;
+        public static string _debugger = "octI8B6usT54nOdZuknstdnEUAs=";
 
         public static void Main(string[] args)
         {
             Log("Initialised TS3RankingBot");
             ReadConfigFile();
             InitDatabase();
+            _ts3Hndl = new TS3Handler();
         }
 
         private static void ReadConfigFile()
@@ -28,14 +34,19 @@ namespace TS3_Ranking_Bot
             }
             _config = JsonConvert.DeserializeObject(File.ReadAllText("config.json"));
             Log("Config File Parsed", ConsoleColor.Green);
+            int[] ranks = _config.ranking.ranks.ToObject<int[]>();
+            if (ranks.Length == 0)
+            {
+                Log("WARN - CFG - There are no ranks configured in the config file. Please add some ServerGroup IDs to the ranks array", ConsoleColor.Yellow);
+            }
         }
 
         private static void InitDatabase()
         {
-            _mysqlCon = new MySqlConnection("server=" + _config.database.server + ";database=" + _config.database.dbname + ";uid=" + _config.database.username + ";password=" + _config.database.password);
+            _mysql = new MySqlConnection("server=" + _config.database.server + ";database=" + _config.database.dbname + ";uid=" + _config.database.username + ";password=" + _config.database.password);
             try
             {
-                _mysqlCon.Open();
+                _mysql.Open();
             }
             catch (MySqlException e)
             {
@@ -48,7 +59,7 @@ namespace TS3_Ranking_Bot
         private static void VerifyTables()
         {
             MySqlDataReader r;
-            bool verified = false;
+            bool verified = true;
             string[] tables = new string[] { "users" };
             foreach (string tbl in tables)
             {
@@ -57,6 +68,10 @@ namespace TS3_Ranking_Bot
                 if (r == null)
                 {
                     verified = false;
+                }
+                else
+                {
+                    r.Close();
                 }
             }
 
@@ -73,12 +88,13 @@ namespace TS3_Ranking_Bot
                         Log("ERROR - MySQL - Failed to create tables...", ConsoleColor.Red);
                         Environment.Exit(1);
                     }
+                    res.Close();
                     Log("Tables created!", ConsoleColor.Green);
                 }
             }
         }
 
-        private static void Log(string msg, ConsoleColor col = ConsoleColor.White)
+        public static void Log(string msg, ConsoleColor col = ConsoleColor.White)
         {
             if (msg != null)
             {
@@ -107,7 +123,7 @@ namespace TS3_Ranking_Bot
         {
             try
             {
-                MySqlCommand c = new MySqlCommand(cmd, _mysqlCon);
+                MySqlCommand c = new MySqlCommand(cmd, _mysql);
                 return c.ExecuteReader();
             }
             catch (MySqlException e)
@@ -115,6 +131,16 @@ namespace TS3_Ranking_Bot
                 Log("ERROR - MySQL - " + e.Message, ConsoleColor.Red);
                 return null;
             }
+        }
+
+        public static dynamic GetConfig()
+        {
+            return _config;
+        }
+
+        public static MySqlConnection GetMySQL()
+        {
+            return _mysql;
         }
     }
 }

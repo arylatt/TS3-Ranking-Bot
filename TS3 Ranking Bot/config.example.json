@@ -9,7 +9,7 @@
   },
   "teamspeak": {
     "sq_ip": "ts.example.com",
-    "sq_port": 11001,
+    "sq_port": 10011,
     "username": "YourSQUser",
     "password": "YourSQPassword",
     "ts_port": 9987
