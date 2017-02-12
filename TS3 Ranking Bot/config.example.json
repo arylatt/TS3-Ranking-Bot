@@ -17,5 +17,8 @@
   "ranking": {
     "max_idle_time": 15,
     "ranks": []
+  },
+  "clients": {
+    "member_group": null
   }
 }

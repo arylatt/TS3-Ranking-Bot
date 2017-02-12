@@ -63,6 +63,19 @@ namespace TS3_Ranking_Bot
         private void DoRank(Object o)
         {
             _clinfo = new ClientInfoCommand(_clid).Execute(RankingBot._ts3);
+
+            if (_config.clients.member_group != null)
+            {
+                if (!_clinfo.ServerGroups.Contains((uint)_config.clients.member_group))
+                {
+                    new ClientUpdateCommand(new ClientModification() { Nickname = "Ranking Bot" }).Execute(RankingBot._ts3);
+                    if (new ServerGroupAddClientCommand((uint)_config.clients.member_group, _clinfo.DatabaseId).Execute(RankingBot._ts3).IsErroneous)
+                    {
+                        RankingBot.Log("ERROR - TS3 - Failed to add client '" + _clinfo.Nickname + "' (" + _clinfo.UniqueId + ") to ServerGroup " + _config.clients.member_group, ConsoleColor.Red);
+                    }
+                }
+            }
+
             if (_clinfo.IdleTime < TimeSpan.FromMinutes((double)_config.ranking.max_idle_time))
             {
                 _time++;
