@@ -250,3 +250,7 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# TS3 Ranking Bot Custom
+TS3 Ranking Bot/logs/
+TS3 Ranking Bot/config.json
