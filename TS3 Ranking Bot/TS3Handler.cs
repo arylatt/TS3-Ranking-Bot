@@ -150,6 +150,7 @@ namespace TS3_Ranking_Bot
 
         private void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {
+            RankingBot.Debug("DEBUG - CORE - Entered Console_CancelKeyPress()");
             e.Cancel = true;
             _exiting = true;
             RankingBot.Log("Exiting (Reason: Ctrl+C interrupt)", ConsoleColor.Green);
@@ -179,6 +180,7 @@ namespace TS3_Ranking_Bot
 
         private void _ts3_ClientDisconnectedAny(uint clid)
         {
+            RankingBot.Debug("DEBUG - TS3 - Entered _ts3_ClientDisconnectedAny(" + clid + ")");
             if (clients[clid] != null)
             {
                 clients[clid].Dispose();
@@ -188,15 +190,18 @@ namespace TS3_Ranking_Bot
 
         private void _ts3_ClientJoined(object sender, TS3QueryLib.Net.Core.Server.Notification.EventArgs.ClientJoinedEventArgs e)
         {
-            ClientInfoCommandResponse client = new ClientInfoCommand(e.ClientId).Execute(RankingBot._ts3);
-            if (client.Type == 0)
+            RankingBot.Debug("DEBUG - TS3 - Entered _ts3_ClientJoined(Nickname: " + e.Nickname + ", ClientId: " + e.ClientId + ")");
+            if (e.Nickname != null)
             {
-                if (RankingBot._debug && client.UniqueId != RankingBot._debugger)
+                if (e.ClientType == 0)
                 {
-                    RankingBot.Log("DEBUG - TS3 - Ignoring client '" + client.Nickname + "' (" + client.UniqueId + ") as we are debugging", ConsoleColor.Magenta);
-                    return;
+                    if (RankingBot._debug && e.ClientUniqueId != RankingBot._debugger && RankingBot._debugger != null)
+                    {
+                        RankingBot.Debug("DEBUG - TS3 - Ignoring client '" + e.Nickname + "' (" + e.ClientUniqueId + ") as we are debugging");
+                        return;
+                    }
+                    clients.Add(e.ClientId, new RankedClient(e.ClientId));
                 }
-                clients.Add(e.ClientId, new RankedClient(e.ClientId));
             }
         }
 
@@ -209,9 +214,9 @@ namespace TS3_Ranking_Bot
                 {
                     if (cli.ClientType == 0)
                     {
-                        if (RankingBot._debug && cli.ClientUniqueId != RankingBot._debugger)
+                        if (RankingBot._debug && cli.ClientUniqueId != RankingBot._debugger && RankingBot._debugger != null)
                         {
-                            RankingBot.Log("DEBUG - TS3 - Ignoring client '" + cli.Nickname + "' (" + cli.ClientUniqueId + ") as we are debugging", ConsoleColor.Magenta);
+                            RankingBot.Debug("DEBUG - TS3 - Ignoring client '" + cli.Nickname + "' (" + cli.ClientUniqueId + ") as we are debugging");
                         }
                         else
                         {
@@ -230,10 +235,12 @@ namespace TS3_Ranking_Bot
 
         private void _ts3_ConnectionClosed(object sender, EventArgs<string> e)
         {
+            RankingBot.Debug("DEBUG - TS3 - Entered _ts3_ConnectionClosed()");
             foreach (RankedClient cli in clients.Values)
             {
                 cli.Dispose();
             }
+            clients = new Dictionary<uint, RankedClient>();
             if (!_exiting)
             {
                 RankingBot.Log("ERROR - TS3 - Connection to server lost", ConsoleColor.Red);
@@ -248,6 +255,7 @@ namespace TS3_Ranking_Bot
 
         private void _ts3_KeepAlive(Object o)
         {
+            RankingBot.Debug("DEBUG - TS3 - Sent KeepAlive");
             RankingBot._ts3.Send("whoami");
         }
     }

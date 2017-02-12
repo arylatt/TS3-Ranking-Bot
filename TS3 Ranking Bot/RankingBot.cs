@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using TS3QueryLib.Net.Core;
 
 namespace TS3_Ranking_Bot
@@ -13,12 +14,15 @@ namespace TS3_Ranking_Bot
         private static dynamic _config;
         private static MySqlConnection _mysql;
         private static TS3Handler _ts3Hndl;
+        private static StreamWriter _logger;
         public static QueryClient _ts3;
-        public static bool _debug = false;
-        public static string _debugger = "octI8B6usT54nOdZuknstdnEUAs=";
+        public static bool _debug = true;
+        public static string _debugger = null;
 
         public static void Main(string[] args)
         {
+            LogInit();
+            Debug("DEBUG - CORE - Enter Main()");
             Log("Initialised TS3RankingBot");
             ReadConfigFile();
             InitDatabase();
@@ -27,6 +31,7 @@ namespace TS3_Ranking_Bot
 
         public static void TryReconnect()
         {
+            Debug("DEBUG - CORE - Enter TryReconnect()");
             Log("WARN - TS3 - Lost Connection. Attempting to reconnect in 10 seconds", ConsoleColor.Yellow);
             System.Threading.Thread.Sleep(10000);
             _ts3Hndl = new TS3Handler();
@@ -34,6 +39,7 @@ namespace TS3_Ranking_Bot
 
         private static void ReadConfigFile()
         {
+            Debug("DEBUG - CORE - Enter ReadConfigFile()");
             if (!File.Exists("config.json"))
             {
                 Log("ERROR - Please copy config.example.json to config.json and edit it according to your setup.", ConsoleColor.Red);
@@ -50,6 +56,7 @@ namespace TS3_Ranking_Bot
 
         private static void InitDatabase()
         {
+            Debug("DEBUG - CORE - Enter InitDatabase()");
             _mysql = new MySqlConnection("server=" + _config.database.server + ";database=" + _config.database.dbname + ";uid=" + _config.database.username + ";password=" + _config.database.password);
             try
             {
@@ -65,6 +72,7 @@ namespace TS3_Ranking_Bot
 
         private static void VerifyTables()
         {
+            Debug("DEBUG - CORE - Enter VerifyTables()");
             MySqlDataReader r;
             bool verified = true;
             string[] tables = new string[] { "users" };
@@ -74,10 +82,12 @@ namespace TS3_Ranking_Bot
                 r = ExecuteCommand("show columns from " + _config.database.prefix + tbl);
                 if (r == null)
                 {
+                    Debug("DEBUG - MySQL - Empty Reader");
                     verified = false;
                 }
                 else
                 {
+                    Debug("DEBUG - MySQL - Closed Reader");
                     r.Close();
                 }
             }
@@ -101,18 +111,36 @@ namespace TS3_Ranking_Bot
             }
         }
 
+        private static void LogInit()
+        {
+            if (!Directory.Exists("logs"))
+            {
+                Directory.CreateDirectory("logs");
+            }
+            _logger = new StreamWriter(File.Open(@"logs/" + GetLogFile(), FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite), System.Text.Encoding.ASCII, 4096, true);
+        }
+
         public static void Log(string msg, ConsoleColor col = ConsoleColor.White)
         {
-            if (msg != null)
-            {
-                if (!Directory.Exists("logs"))
-                {
-                    Directory.CreateDirectory("logs");
-                }
+            string DateStamp = "[" + DateTime.Now.ToString() + "] ";
+            new Task(() => LogAsync(DateStamp + msg, col)).Start();
+        }
 
-                string DateStamp = "[" + DateTime.Now.ToString() + "] ";
-                Console.WriteLine(DateStamp + msg);
-                File.AppendAllText(@"logs/" + GetLogFile(), DateStamp + msg + Environment.NewLine);
+        private static void LogAsync(string msg, ConsoleColor col)
+        {
+            using (_logger)
+            {
+                Console.ForegroundColor = col;
+                Console.WriteLine(msg);
+                _logger.WriteLine(msg);
+            }
+        }
+
+        public static void Debug(string msg, ConsoleColor col = ConsoleColor.Magenta)
+        {
+            if (_debug)
+            {
+                Log(msg, col);
             }
         }
 
@@ -128,9 +156,11 @@ namespace TS3_Ranking_Bot
 
         private static MySqlDataReader ExecuteCommand(string cmd)
         {
+            Debug("DEBUG - CORE - Enter ExecuteCommand(" + cmd + ")");
             try
             {
                 MySqlCommand c = new MySqlCommand(cmd, _mysql);
+                Debug("DEBUG - MySQL - Opened Reader");
                 return c.ExecuteReader();
             }
             catch (MySqlException e)
