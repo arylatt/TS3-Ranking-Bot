@@ -5,6 +5,13 @@
     <AssemblyName>TS3_Ranking_Bot</AssemblyName>
     <RootNamespace>TS3_Ranking_Bot</RootNamespace>
     <RuntimeIdentifiers>win10-x64;debian.8-x64;</RuntimeIdentifiers>
+    <Version>1.1.0</Version>
+    <Authors>Andrew Rylatt</Authors>
+    <Company />
+    <Product>TeamSpeak 3 Ranking Bot</Product>
+    <Description>A simple bot to give users a ServerGroup based on the amount of time they have been active on a TeamSpeak 3 server.</Description>
+    <PackageProjectUrl>https://github.com/arylatt/TS3-Ranking-Bot</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/arylatt/TS3-Ranking-Bot</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="init.sql" />
