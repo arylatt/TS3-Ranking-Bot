@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using TS3QueryLib.Net.Core;
+using TS3QueryLib.Net.Core.Server.Notification;
 
 namespace TS3_Ranking_Bot
 {
@@ -112,6 +113,12 @@ namespace TS3_Ranking_Bot
                 Logger.Debug(_file + " Error executing query '" + cmd + "': " + e.Message);
                 return null;
             }
+        }
+
+        public static void ConnectTS3(string ip, ushort port, NotificationHub notify)
+        {
+            TS3 = new QueryClient(ip, port, notify);
+            Logger.Debug(_file + " Created new QueryClient");
         }
     }
 }
