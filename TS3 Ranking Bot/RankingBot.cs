@@ -3,22 +3,27 @@ using MySql.Data.MySqlClient;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using TS3QueryLib.Net.Core;
+using TS3QueryLib.Net.Core.Server.Commands;
 using TS3QueryLib.Net.Core.Server.Notification;
+using TS3QueryLib.Net.Core.Server.Responses;
 
 namespace TS3_Ranking_Bot
 {
     public class RankingBot
     {
         public static Logger Logger { get; protected set; }
-        public static bool Debugging { get; protected set; } = true;
+        public static bool Debugging { get; protected set; } = false;
         public static string Debugger { get; protected set; } = null;
+        public static bool DebugRank { get; protected set; } = false;
         public static MySqlConnection MySQL { get; protected set; }
         public static QueryClient TS3 { get; protected set; }
         public static TS3Handler TS3Handler { get; protected set; }
         public static dynamic Config { get; protected set; }
 
         private static string _file = "[RankingBot]";
+        public static object TS3Lock = new object();
 
         public static void Main(string[] args)
         {
@@ -42,6 +47,21 @@ namespace TS3_Ranking_Bot
             {
                 Logger.Warn(_file + " There are no ranks defined in the config file.");
             }
+            if (Config.debug != null)
+            {
+                if (Config.debug.debugging != null)
+                {
+                    Debugging = (bool)Config.debug.debugging;
+                }
+                if (Config.debug.debugger != null)
+                {
+                    Debugger = (string)Config.debug.debugger;
+                }
+                if (Config.debug.rank != null)
+                {
+                    DebugRank = (bool)Config.debug.rank;
+                }
+            }
             Logger.Debug(_file + " Finish reading config");
         }
 
@@ -60,6 +80,7 @@ namespace TS3_Ranking_Bot
                 Environment.Exit(1);
             }
             VerifyTables();
+            MySQL.Close();
             Logger.Debug(_file + " Finish init database");
         }
 
@@ -101,7 +122,7 @@ namespace TS3_Ranking_Bot
             Logger.Debug(_file + " Finish verify tables");
         }
 
-        public static MySqlDataReader ExecuteCommand(string cmd)
+        private static MySqlDataReader ExecuteCommand(string cmd)
         {
             try
             {

@@ -79,12 +79,12 @@ namespace TS3_Ranking_Bot
 
         public void Info(string msg)
         {
-            Log("[INFO] " + msg, ConsoleColor.Cyan);
+            Log("[INFO]  " + msg, ConsoleColor.Cyan);
         }
 
         public void Warn(string msg)
         {
-            Log("[WARN] " + msg, ConsoleColor.Yellow);
+            Log("[WARN]  " + msg, ConsoleColor.Yellow);
         }
 
         public void Error(string msg)
