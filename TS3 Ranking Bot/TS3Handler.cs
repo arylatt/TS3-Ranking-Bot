@@ -15,10 +15,13 @@ namespace TS3_Ranking_Bot
         private string _file = "[TS3Handler]";
         private Timer _keepAlive;
         private bool _running = true;
+        private bool _recon = false;
         private Dictionary<uint, Client> _clients;
 
-        public TS3Handler()
+        public TS3Handler(bool recon = false)
         {
+            _recon = recon;
+
             RankingBot.Logger.Debug(_file + " Init TS3 Handler");
             NotificationHub notify = new NotificationHub();
             notify.ClientJoined.Triggered += TS3_ClientJoined;
@@ -39,7 +42,12 @@ namespace TS3_Ranking_Bot
             catch (SocketException e)
             {
                 RankingBot.Logger.Error(_file + " Error connecting to TS3 server: " + e.Message);
-                Environment.Exit(1);
+                if (!_recon)
+                {
+                    Environment.Exit(1);
+                }
+                RankingBot.TryReconnect();
+                return;
             }
 
             RankingBot.Logger.Debug(_file + " Logging in to ServerQuery");
@@ -53,7 +61,12 @@ namespace TS3_Ranking_Bot
             if (new UseCommand((ushort)RankingBot.Config.teamspeak.ts_port).Execute(RankingBot.TS3).IsErroneous)
             {
                 RankingBot.Logger.Error(_file + " Unable to access TS3 server running on port '" + RankingBot.Config.teamspeak.ts_port + "'");
-                Environment.Exit(1);
+                if (!_recon)
+                {
+                    Environment.Exit(1);
+                }
+                RankingBot.TryReconnect();
+                return;
             }
 
             _clients = new Dictionary<uint, Client>();
@@ -130,7 +143,8 @@ namespace TS3_Ranking_Bot
             }
             else
             {
-                // TODO: Handle unexpected disconnects
+                RankingBot.TryReconnect();
+                return;
             }
         }
 
@@ -219,7 +233,11 @@ namespace TS3_Ranking_Bot
                         {
                             if (cmdSplit[1] == "users")
                             {
-                                // TODO: Show all users
+                                List<uint> clients = new List<uint>(_clients.Keys);
+                                foreach (uint client in clients)
+                                {
+                                    RankingBot.Logger.Info(_file + " SHOW USERS - " + _clients[client].GetInfo());
+                                }
                             }
                             else if (cmdSplit[1] == "user")
                             {
@@ -239,7 +257,7 @@ namespace TS3_Ranking_Bot
                                         }
                                         else
                                         {
-                                            // TODO: Show user
+                                            RankingBot.Logger.Info(_file + " SHOW USER - " + cli.GetInfo());
                                         }
                                     }
                                     else
@@ -247,6 +265,50 @@ namespace TS3_Ranking_Bot
                                         RankingBot.Logger.Info(_file + " SHOW USER " + cmdSplit[2] + ": ClientID not found");
                                     }
                                 }
+                            }
+                        }
+                        break;
+                    case "set":
+                        if (cmdSplit.Length != 4)
+                        {
+                            RankingBot.Logger.Info(_file + " SET - Command Usage: 'set time <ClientID> <Time>' OR 'set level <ClientID> <Level>'");
+                        }
+                        else
+                        {
+                            if (cmdSplit[1] == "time" || cmdSplit[1] == "level")
+                            {
+                                uint c;
+                                if (UInt32.TryParse(cmdSplit[2], out c))
+                                {
+                                    Client cli;
+                                    if (!_clients.TryGetValue(c, out cli))
+                                    {
+                                        RankingBot.Logger.Info(_file + " SET " + cmdSplit[1].ToUpper() + " " + cmdSplit[2] + ": ClientID not found");
+                                    }
+                                    else
+                                    {
+                                        int tl;
+                                        if (Int32.TryParse(cmdSplit[3], out tl))
+                                        {
+                                            if (cmdSplit[1] == "time")
+                                            {
+                                                cli.SetTime(tl);
+                                            }
+                                            else
+                                            {
+                                                cli.SetLevel(tl);
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    RankingBot.Logger.Info(_file + " SET " + cmdSplit[1].ToUpper() + " " + ": ClientID not found");
+                                }
+                            }
+                            else
+                            {
+                                RankingBot.Logger.Info(_file + " SET - Command Usage: 'set time <ClientID> <Time>' OR 'set level <ClientID> <Level>'");
                             }
                         }
                         break;

@@ -287,5 +287,31 @@ namespace TS3_Ranking_Bot
             DisconnectDB();
             _timer.Dispose();
         }
+
+        public string GetInfo()
+        {
+            string nick = _clinfo.Nickname;
+            string uuid = _clinfo.UniqueId;
+            string clid = _clid.ToString();
+            string level = _level.ToString();
+            string time = _time.ToString();
+            return "Nickname: " + nick + ", UUID: " + uuid + ", ClientID: " + clid + ", Level: " + level + ", Time: " + time;
+        }
+
+        public void SetTime(int time)
+        {
+            _time = Convert.ToDouble(time);
+            _level = Convert.ToInt32(Math.Round(Math.Log(time / 15, 1.55))) + 1;
+            RankingBot.Logger.Info(_file + " Client has been set to time '" + _time + "' (ClientID: '" + _clid + "')");
+            SetGroups();
+        }
+
+        public void SetLevel(int level)
+        {
+            _level = level;
+            _time = Math.Round(15 * Math.Pow(1.55, level - 1));
+            RankingBot.Logger.Info(_file + " Client has been set to level '" + _level + "' (ClientID: '" + _clid + "')");
+            SetGroups();
+        }
     }
 }

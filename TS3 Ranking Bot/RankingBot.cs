@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using TS3QueryLib.Net.Core;
 using TS3QueryLib.Net.Core.Server.Notification;
 
@@ -21,6 +22,7 @@ namespace TS3_Ranking_Bot
 
         private static string _file = "[RankingBot]";
         public static object TS3Lock = new object();
+        private static Timer _recon;
 
         public static void Main(string[] args)
         {
@@ -137,6 +139,19 @@ namespace TS3_Ranking_Bot
         {
             TS3 = new QueryClient(ip, port, notify);
             Logger.Debug(_file + " Created new QueryClient");
+        }
+
+        public static void TryReconnect()
+        {
+            Logger.Warn(_file + " Lost connection to TS3. Attempting to reconnect in 30 seconds");
+            _recon = new Timer(Reset, null, 30000, 30000);
+        }
+
+        private static void Reset(object o)
+        {
+            Logger.Info(_file + " Attempting to reconnect");
+            _recon.Dispose();
+            TS3Handler = new TS3Handler(true);
         }
     }
 }
