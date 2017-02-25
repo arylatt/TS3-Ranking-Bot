@@ -111,7 +111,7 @@ namespace TS3_Ranking_Bot
                 }
                 else
                 {
-                    RankingBot.Logger.Error(_file + " Repeated exceptions trying to get client info. Invalidating client (ClientID: '" + _clid + "')");
+                    RankingBot.Logger.Error(_file + " Repeated exceptions (" + e.Message + ") trying to get client info. Invalidating client (ClientID: '" + _clid + "')");
                     Invalidate();
                     return;
                 }
