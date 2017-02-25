@@ -271,11 +271,11 @@ namespace TS3_Ranking_Bot
                     case "set":
                         if (cmdSplit.Length != 4)
                         {
-                            RankingBot.Logger.Info(_file + " SET - Command Usage: 'set time <ClientID> <Time>' OR 'set level <ClientID> <Level>'");
+                            RankingBot.Logger.Info(_file + " SET - Command Usage: 'set level <ClientID> <Level>'");
                         }
                         else
                         {
-                            if (cmdSplit[1] == "time" || cmdSplit[1] == "level")
+                            if (cmdSplit[1] == "level")
                             {
                                 uint c;
                                 if (UInt32.TryParse(cmdSplit[2], out c))
@@ -283,32 +283,25 @@ namespace TS3_Ranking_Bot
                                     Client cli;
                                     if (!_clients.TryGetValue(c, out cli))
                                     {
-                                        RankingBot.Logger.Info(_file + " SET " + cmdSplit[1].ToUpper() + " " + cmdSplit[2] + ": ClientID not found");
+                                        RankingBot.Logger.Info(_file + " SET LEVEL " + cmdSplit[2] + ": ClientID not found");
                                     }
                                     else
                                     {
                                         int tl;
                                         if (Int32.TryParse(cmdSplit[3], out tl))
                                         {
-                                            if (cmdSplit[1] == "time")
-                                            {
-                                                cli.SetTime(tl);
-                                            }
-                                            else
-                                            {
-                                                cli.SetLevel(tl);
-                                            }
+                                            cli.SetLevel(tl);
                                         }
                                     }
                                 }
                                 else
                                 {
-                                    RankingBot.Logger.Info(_file + " SET " + cmdSplit[1].ToUpper() + " " + ": ClientID not found");
+                                    RankingBot.Logger.Info(_file + " SET LEVEL " + ": ClientID not found");
                                 }
                             }
                             else
                             {
-                                RankingBot.Logger.Info(_file + " SET - Command Usage: 'set time <ClientID> <Time>' OR 'set level <ClientID> <Level>'");
+                                RankingBot.Logger.Info(_file + " SET - Command Usage: 'set level <ClientID> <Level>'");
                             }
                         }
                         break;

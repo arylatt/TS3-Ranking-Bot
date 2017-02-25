@@ -298,18 +298,20 @@ namespace TS3_Ranking_Bot
             return "Nickname: " + nick + ", UUID: " + uuid + ", ClientID: " + clid + ", Level: " + level + ", Time: " + time;
         }
 
-        public void SetTime(int time)
-        {
-            _time = Convert.ToDouble(time);
-            _level = Convert.ToInt32(Math.Round(Math.Log(time / 15, 1.55))) + 1;
-            RankingBot.Logger.Info(_file + " Client has been set to time '" + _time + "' (ClientID: '" + _clid + "')");
-            SetGroups();
-        }
-
         public void SetLevel(int level)
         {
             _level = level;
             _time = Math.Round(15 * Math.Pow(1.55, level - 1));
+
+            ConnectDB();
+            MySqlCommand c = new MySqlCommand("update " + RankingBot.Config.database.prefix + "users set cur_time = '" + _time + "', cur_level = '" + _level + "' where id = '" + _dbid + "'", _mysql);
+            if (c.ExecuteNonQuery() != 1)
+            {
+                RankingBot.Logger.Error(_file + " Error updating record in DB (ClientID: '" + _clid + "')");
+                RankingBot.Logger.Debug(_file + " Error running SQL query: '" + c.CommandText + "'");
+            }
+            DisconnectDB();
+
             RankingBot.Logger.Info(_file + " Client has been set to level '" + _level + "' (ClientID: '" + _clid + "')");
             SetGroups();
         }
