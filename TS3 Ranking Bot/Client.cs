@@ -2,12 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using TS3QueryLib.Net.Core;
-using TS3QueryLib.Net.Core.Common;
 using TS3QueryLib.Net.Core.Common.Responses;
 using TS3QueryLib.Net.Core.Server.Commands;
 using TS3QueryLib.Net.Core.Server.Entitities;
-using TS3QueryLib.Net.Core.Server.Notification;
 using TS3QueryLib.Net.Core.Server.Responses;
 
 namespace TS3_Ranking_Bot
@@ -94,7 +91,7 @@ namespace TS3_Ranking_Bot
                     ClientInfoCommandResponse clinfo = new ClientInfoCommand(_clid).Execute(RankingBot.TS3);
                     if (clinfo.IsErroneous)
                     {
-                        RankingBot.Logger.Error(_file + " Received errorneous client info data (ClientID: '" + _clid + "')");
+                        RankingBot.Logger.Error(_file + " Received erroneous client info data (ClientID: '" + _clid + "')");
                         RankingBot.Logger.Debug(_file + " Erroneous data: " + clinfo.ResponseText);
                         Invalidate();
                         return;
@@ -109,7 +106,7 @@ namespace TS3_Ranking_Bot
                 if (_errors != 2)
                 {
                     _errors++;
-                    RankingBot.Logger.Warn(_file + " Caught exception trying to get client info, will try " + (3 - _errors) + "more time(s) (ClientID: '" + _clid + "')");
+                    RankingBot.Logger.Warn(_file + " Caught exception trying to get client info, will try " + (3 - _errors) + " more time(s) (ClientID: '" + _clid + "')");
                     FetchClientInfo();
                 }
                 else
@@ -129,7 +126,7 @@ namespace TS3_Ranking_Bot
                 return;
             }
 
-            if (_clinfo.IdleTime < TimeSpan.FromMinutes((double)RankingBot.Config.ranking.max_idle_time))
+            if (RankingBot.Config.ranking.max_idle_time == null || _clinfo.IdleTime < TimeSpan.FromMinutes((double)RankingBot.Config.ranking.max_idle_time))
             {
                 _time++;
                 RankingBot.Logger.Debug(_file + " Client not idle, time increased to '" + _time + "' minutes (ClientID: '" + _clid + "')");
@@ -159,17 +156,17 @@ namespace TS3_Ranking_Bot
                 return;
             }
 
-            uint[] groups = RankingBot.Config.ranking.ranks.ToObject<uint[]>();
-            List<uint> groupsList = new List<uint>(groups);
+            List<uint> groupsList = new List<uint>(RankingBot.Config.ranking.ranks.ToObject<uint[]>());
             uint add = 0;
 
-            if (_level != 0)
+            RankingBot.Logger.Debug(_file + " Client is level " + _level + " (ClientID: '" + _clid + "')");
+            if (_level - 1 >= 0)
             {
                 if (groupsList.Count == 0) 
                 {
                     RankingBot.Logger.Warn(_file + " There are no ranks defined in the config file.");
                 }
-                else if (groupsList.Count >= _level - 1)
+                else if (groupsList.Count >= _level)
                 {
                     add = groupsList[_level - 1];
                     RankingBot.Logger.Debug(_file + " Client should be in ServerGroup '" + add + "' (ClientID: '" + _clid + "')");

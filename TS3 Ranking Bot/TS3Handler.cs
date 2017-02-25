@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
-using TS3QueryLib.Net.Core;
 using TS3QueryLib.Net.Core.Common;
 using TS3QueryLib.Net.Core.Common.Responses;
 using TS3QueryLib.Net.Core.Server.Commands;
 using TS3QueryLib.Net.Core.Server.Entitities;
 using TS3QueryLib.Net.Core.Server.Notification;
-using TS3QueryLib.Net.Core.Server.Responses;
 
 namespace TS3_Ranking_Bot
 {
@@ -123,12 +121,21 @@ namespace TS3_Ranking_Bot
 
         private void TS3_ConnectionClosed(object sender, EventArgs<string> e)
         {
-            throw new NotImplementedException();
+            if (!_running)
+            {
+                RankingBot.Logger.Info(_file + " Sucessfully shutdown");
+                Environment.Exit(0);
+            }
+            else
+            {
+                // TODO: Handle unexpected disconnects
+            }
         }
 
         private void TS3_BanDetected(object sender, EventArgs<ICommandResponse> e)
         {
-            throw new NotImplementedException();
+            RankingBot.Logger.Error(_file + " Ranking Bot has been banned from the TeamSpeak server");
+            Environment.Exit(1);
         }
 
         private void TS3_ClientLeft_Kicked(object sender, TS3QueryLib.Net.Core.Server.Notification.EventArgs.ClientKickEventArgs e)
@@ -179,6 +186,11 @@ namespace TS3_Ranking_Bot
 
         private void MenuInput(string cmd)
         {
+            if (cmd == null)
+            {
+                return;
+            }
+
             string[] cmdSplit = cmd.Split(' ');
             if (cmdSplit.Length >= 1)
             {
@@ -195,6 +207,46 @@ namespace TS3_Ranking_Bot
                     case "quit":
                         RankingBot.Logger.Info(_file + " Exiting app");
                         Exit();
+                        break;
+                    case "show":
+                        if (cmdSplit.Length == 1)
+                        {
+                            RankingBot.Logger.Info(_file + " SHOW - Command Usage: 'show users' OR 'show user <ClientID>'");
+                        }
+                        else
+                        {
+                            if (cmdSplit[1] == "users")
+                            {
+                                // TODO: Show all users
+                            }
+                            else if (cmdSplit[1] == "user")
+                            {
+                                if (cmdSplit.Length == 2)
+                                {
+                                    RankingBot.Logger.Info(_file + " SHOW USER - Command Usage: 'show user <ClientID>'");
+                                }
+                                else
+                                {
+                                    uint c;
+                                    if (UInt32.TryParse(cmdSplit[2], out c))
+                                    {
+                                        Client cli;
+                                        if (!_clients.TryGetValue(c, out cli))
+                                        {
+                                            RankingBot.Logger.Info(_file + " SHOW USER " + cmdSplit[2] + ": ClientID not found");
+                                        }
+                                        else
+                                        {
+                                            // TODO: Show user
+                                        }
+                                    }
+                                    else
+                                    {
+                                        RankingBot.Logger.Info(_file + " SHOW USER " + cmdSplit[2] + ": ClientID not found");
+                                    }
+                                }
+                            }
+                        }
                         break;
                     default:
                         RankingBot.Logger.Warn(_file + " Unknown console command '" + cmdSplit[0] + "'");

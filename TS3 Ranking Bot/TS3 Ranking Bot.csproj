@@ -5,7 +5,7 @@
     <AssemblyName>TS3_Ranking_Bot</AssemblyName>
     <RootNamespace>TS3_Ranking_Bot</RootNamespace>
     <RuntimeIdentifiers>win10-x64;debian.8-x64;</RuntimeIdentifiers>
-    <Version>1.1.0</Version>
+    <Version>1.1.0.0</Version>
     <Authors>Andrew Rylatt</Authors>
     <Company />
     <Product>TeamSpeak 3 Ranking Bot</Product>

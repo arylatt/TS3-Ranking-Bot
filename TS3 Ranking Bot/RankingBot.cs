@@ -3,11 +3,8 @@ using MySql.Data.MySqlClient;
 using System;
 using System.IO;
 using System.Reflection;
-using System.Threading;
 using TS3QueryLib.Net.Core;
-using TS3QueryLib.Net.Core.Server.Commands;
 using TS3QueryLib.Net.Core.Server.Notification;
-using TS3QueryLib.Net.Core.Server.Responses;
 
 namespace TS3_Ranking_Bot
 {
@@ -31,6 +28,7 @@ namespace TS3_Ranking_Bot
             ReadConfigFile();
             InitDatabase();
             TS3Handler = new TS3Handler();
+            new UpdateChecker();
         }
 
         private static void ReadConfigFile()
