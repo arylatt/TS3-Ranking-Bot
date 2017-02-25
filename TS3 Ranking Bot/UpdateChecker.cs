@@ -47,7 +47,7 @@ namespace TS3_Ranking_Bot
                         }
                         else
                         {
-                            RankingBot.Logger.Info(_file + " Currently up to date [" + info.tag_name + "]");
+                            RankingBot.Logger.Info(_file + " Currently up to date [" + _ver + "]");
                         }
                     }
                 }
