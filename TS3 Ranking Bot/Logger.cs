@@ -46,7 +46,7 @@ namespace TS3_Ranking_Bot
             {
                 Directory.CreateDirectory("logs");
             }
-            string date = DateTime.Today.ToString("yyyy-MM-ddex");
+            string date = DateTime.Today.ToString("yyyy-MM-dd");
             string logFile = @"logs/" + date + "_" + (Directory.GetFiles(@"logs/", date + "_*.log").Length + 1).ToString() + ".log";
             _logger = new StreamWriter(File.Open(logFile, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite), Encoding.ASCII, 4096, true);
         }
