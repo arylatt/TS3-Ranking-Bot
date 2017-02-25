@@ -1,10 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using TS3QueryLib.Net.Core.Server.Commands;
 
@@ -12,7 +9,7 @@ namespace TS3_Ranking_Bot
 {
     class UpdateChecker
     {
-        private string _file = "[UpdateChkr]";
+        private string _file = "[Updater]   ";
         private string _ver;
         private Timer _timer;
 
@@ -43,8 +40,12 @@ namespace TS3_Ranking_Bot
                                 msg = info.message;
                             }
 
-                            RankingBot.Logger.Info(_file + " Update Available (" + msg + ")");
+                            RankingBot.Logger.Info(_file + " Update Available [" + _ver + "] -> [" + info.latest + "] (" + msg + ")");
                             new SendTextMessageCommand(TS3QueryLib.Net.Core.Common.CommandHandling.MessageTarget.Server, 0, "Update Available! " + msg).Execute(RankingBot.TS3);
+                        }
+                        else
+                        {
+                            RankingBot.Logger.Info(_file + " Currently up to date [" + _ver + "]");
                         }
                     }
                 }

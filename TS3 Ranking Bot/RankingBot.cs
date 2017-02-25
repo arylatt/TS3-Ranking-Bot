@@ -28,7 +28,6 @@ namespace TS3_Ranking_Bot
             ReadConfigFile();
             InitDatabase();
             TS3Handler = new TS3Handler();
-            new UpdateChecker();
         }
 
         private static void ReadConfigFile()

@@ -68,6 +68,8 @@ namespace TS3_Ranking_Bot
             _keepAlive = new Timer(TS3_KeepAlive, null, 30000, 30000);
             RegisterConnectedClients();
             Console.CancelKeyPress += Console_CancelKeyPress;
+            
+            new UpdateChecker();
 
             while (_running)
             {
